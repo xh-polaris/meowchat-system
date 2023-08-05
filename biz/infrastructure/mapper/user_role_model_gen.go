@@ -3,7 +3,7 @@ package mapper
 
 import (
 	"context"
-	"meowchat-system/biz/infrastructure/data/db"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
 	"time"
 
 	"github.com/zeromicro/go-zero/core/stores/monc"

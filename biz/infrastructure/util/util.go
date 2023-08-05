@@ -1,9 +1,9 @@
 package util
 
 import (
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"meowchat-system/biz/infrastructure/data/db"
 )
 
 func ConvertAdmin(in *db.Admin) *system.Admin {

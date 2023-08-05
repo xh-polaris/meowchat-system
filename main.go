@@ -1,10 +1,10 @@
 package main
 
 import (
-	"meowchat-system/provider"
+	"github.com/xh-polaris/meowchat-system/provider"
 	"net"
 
-	"meowchat-system/biz/infrastructure/util/log"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/util/log"
 
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"

@@ -2,9 +2,9 @@ package provider
 
 import (
 	"github.com/google/wire"
-	"meowchat-system/biz/application/service"
-	"meowchat-system/biz/infrastructure/config"
-	"meowchat-system/biz/infrastructure/mapper"
+	"github.com/xh-polaris/meowchat-system/biz/application/service"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/config"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper"
 )
 
 var AllProvider = wire.NewSet(

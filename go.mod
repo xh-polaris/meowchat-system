@@ -1,9 +1,9 @@
-module meowchat-system
+module github.com/xh-polaris/meowchat-system
 
 go 1.19
 
 require (
-	github.com/cloudwego/hertz v0.6.6
+	github.com/bytedance/sonic v1.8.8
 	github.com/cloudwego/kitex v0.6.2
 	github.com/google/wire v0.5.0
 	github.com/kitex-contrib/obs-opentelemetry v0.2.3
@@ -18,7 +18,6 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bufbuild/protocompile v0.4.0 // indirect
 	github.com/bytedance/gopkg v0.0.0-20230531144706-a12972768317 // indirect
-	github.com/bytedance/sonic v1.8.8 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect

@@ -3,12 +3,12 @@ package mapper
 import (
 	"context"
 	"github.com/google/wire"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/config"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"meowchat-system/biz/infrastructure/config"
-	"meowchat-system/biz/infrastructure/data/db"
 	"time"
 )
 

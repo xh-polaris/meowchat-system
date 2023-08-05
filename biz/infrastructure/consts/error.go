@@ -1,8 +1,8 @@
 package consts
 
 import (
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper"
 	"google.golang.org/grpc/status"
-	"meowchat-system/biz/infrastructure/mapper"
 )
 
 var (

@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 
-	"meowchat-system/biz/application/service"
-	"meowchat-system/biz/infrastructure/config"
+	"github.com/xh-polaris/meowchat-system/biz/application/service"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/config"
 )
 
 type SystemServerImpl struct {

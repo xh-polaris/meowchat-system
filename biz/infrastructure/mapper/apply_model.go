@@ -3,11 +3,11 @@ package mapper
 import (
 	"context"
 	"github.com/google/wire"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/config"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 	"github.com/zeromicro/go-zero/core/stores/mon"
 	"go.mongodb.org/mongo-driver/bson"
-	"meowchat-system/biz/infrastructure/config"
-	"meowchat-system/biz/infrastructure/data/db"
 )
 
 const ApplyCollectionName = "apply"

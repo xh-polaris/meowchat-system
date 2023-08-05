@@ -2,13 +2,13 @@ package service
 
 import (
 	"context"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/consts"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/util"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/util/log"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"meowchat-system/biz/infrastructure/consts"
-	"meowchat-system/biz/infrastructure/data/db"
-	"meowchat-system/biz/infrastructure/mapper"
-	"meowchat-system/biz/infrastructure/util"
-	"meowchat-system/biz/infrastructure/util/log"
 	"time"
 
 	"github.com/google/wire"
