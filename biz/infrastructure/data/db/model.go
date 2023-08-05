@@ -1,4 +1,4 @@
-package consts
+package db
 
 const (
 	RoleUser           = "user"

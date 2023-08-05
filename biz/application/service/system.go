@@ -2,8 +2,6 @@ package service
 
 import (
 	"context"
-	"github.com/xh-polaris/meowchat-system-rpc/common/constant"
-	"github.com/xh-polaris/meowchat-system-rpc/common/errorx"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"meowchat-system/biz/infrastructure/consts"
@@ -76,7 +74,7 @@ func (s *SystemServiceImpl) CheckCommunityIdExist(ctx context.Context, id string
 	}
 	r, err := s.CommunityModel.FindOne(ctx, id)
 	if err != nil {
-		return primitive.NilObjectID, errorx.ErrCommunityIdNotFound
+		return primitive.NilObjectID, consts.ErrCommunityIdNotFound
 	}
 	return r.ID, nil
 }
@@ -87,10 +85,10 @@ func (s *SystemServiceImpl) CheckParentCommunityId(ctx context.Context, parentId
 	}
 	r, err := s.CommunityModel.FindOne(ctx, parentId)
 	if err != nil {
-		return primitive.NilObjectID, errorx.ErrCommunityIdNotFound
+		return primitive.NilObjectID, consts.ErrCommunityIdNotFound
 	}
 	if r.ParentId != primitive.NilObjectID {
-		return primitive.NilObjectID, errorx.ErrChildCommunityNotAllowed
+		return primitive.NilObjectID, consts.ErrChildCommunityNotAllowed
 	}
 	return r.ID, nil
 }
@@ -98,7 +96,7 @@ func (s *SystemServiceImpl) CheckParentCommunityId(ctx context.Context, parentId
 func (s *SystemServiceImpl) RetrieveNotice(ctx context.Context, req *system.RetrieveNoticeReq) (resp *system.RetrieveNoticeResp, err error) {
 	notice, err := s.NoticeModel.FindOne(ctx, req.Id)
 	if err != nil {
-		return nil, errorx.Switch(err)
+		return nil, consts.Switch(err)
 	}
 
 	return &system.RetrieveNoticeResp{
@@ -147,7 +145,7 @@ func (s *SystemServiceImpl) UpdateNotice(ctx context.Context, req *system.Update
 	err = s.NoticeModel.UpdateNotice(ctx, req)
 
 	if err != nil {
-		return nil, errorx.Switch(err)
+		return nil, consts.Switch(err)
 	}
 
 	return &system.UpdateNoticeResp{}, nil
@@ -156,7 +154,7 @@ func (s *SystemServiceImpl) UpdateNotice(ctx context.Context, req *system.Update
 func (s *SystemServiceImpl) DeleteNotice(ctx context.Context, req *system.DeleteNoticeReq) (resp *system.DeleteNoticeResp, err error) {
 	err = s.NoticeModel.Delete(ctx, req.Id)
 	if err != nil {
-		return nil, errorx.Switch(err)
+		return nil, consts.Switch(err)
 	}
 
 	return &system.DeleteNoticeResp{}, nil
@@ -165,7 +163,7 @@ func (s *SystemServiceImpl) DeleteNotice(ctx context.Context, req *system.Delete
 func (s *SystemServiceImpl) RetrieveNews(ctx context.Context, req *system.RetrieveNewsReq) (resp *system.RetrieveNewsResp, err error) {
 	news, err := s.NewsModel.FindOne(ctx, req.Id)
 	if err != nil {
-		return nil, errorx.Switch(err)
+		return nil, consts.Switch(err)
 	}
 
 	return &system.RetrieveNewsResp{
@@ -217,7 +215,7 @@ func (s *SystemServiceImpl) UpdateNews(ctx context.Context, req *system.UpdateNe
 	err = s.NewsModel.UpdateNews(ctx, req)
 
 	if err != nil {
-		return nil, errorx.Switch(err)
+		return nil, consts.Switch(err)
 	}
 
 	return &system.UpdateNewsResp{}, nil
@@ -226,7 +224,7 @@ func (s *SystemServiceImpl) UpdateNews(ctx context.Context, req *system.UpdateNe
 func (s *SystemServiceImpl) DeleteNews(ctx context.Context, req *system.DeleteNewsReq) (resp *system.DeleteNewsResp, err error) {
 	err = s.NewsModel.Delete(ctx, req.Id)
 	if err != nil {
-		return nil, errorx.Switch(err)
+		return nil, consts.Switch(err)
 	}
 
 	return &system.DeleteNewsResp{}, nil
@@ -235,7 +233,7 @@ func (s *SystemServiceImpl) DeleteNews(ctx context.Context, req *system.DeleteNe
 func (s *SystemServiceImpl) RetrieveAdmin(ctx context.Context, req *system.RetrieveAdminReq) (resp *system.RetrieveAdminResp, err error) {
 	admin, err := s.AdminModel.FindOne(ctx, req.Id)
 	if err != nil {
-		return nil, errorx.Switch(err)
+		return nil, consts.Switch(err)
 	}
 
 	return &system.RetrieveAdminResp{
@@ -288,7 +286,7 @@ func (s *SystemServiceImpl) UpdateAdmin(ctx context.Context, req *system.UpdateA
 	err = s.AdminModel.UpdateAdmin(ctx, req)
 
 	if err != nil {
-		return nil, errorx.Switch(err)
+		return nil, consts.Switch(err)
 	}
 
 	return &system.UpdateAdminResp{}, nil
@@ -298,7 +296,7 @@ func (s *SystemServiceImpl) DeleteAdmin(ctx context.Context, req *system.DeleteA
 	err = s.AdminModel.Delete(ctx, req.Id)
 
 	if err != nil {
-		return nil, errorx.Switch(err)
+		return nil, consts.Switch(err)
 	}
 
 	return &system.DeleteAdminResp{}, nil
@@ -315,7 +313,7 @@ func (s *SystemServiceImpl) RetrieveUserRole(ctx context.Context, req *system.Re
 				Roles: make([]*system.Role, 0),
 			}, nil
 		case mapper.ErrInvalidObjectId:
-			return nil, errorx.ErrInvalidObjectId
+			return nil, consts.ErrInvalidObjectId
 		default:
 			return nil, err
 		}
@@ -345,7 +343,7 @@ func (s *SystemServiceImpl) ListUserIdByRole(ctx context.Context, req *system.Li
 				UserId: make([]string, 0),
 			}, nil
 		case mapper.ErrInvalidObjectId:
-			return nil, errorx.ErrInvalidObjectId
+			return nil, consts.ErrInvalidObjectId
 		default:
 			return nil, err
 		}
@@ -364,15 +362,15 @@ func (s *SystemServiceImpl) ListUserIdByRole(ctx context.Context, req *system.Li
 func (s *SystemServiceImpl) UpdateUserRole(ctx context.Context, req *system.UpdateUserRoleReq) (resp *system.UpdateUserRoleResp, err error) {
 	id, err := primitive.ObjectIDFromHex(req.UserId)
 	if err != nil {
-		return nil, errorx.ErrInvalidObjectId
+		return nil, consts.ErrInvalidObjectId
 	}
 
 	roles := make([]db.Role, len(req.Roles))
 	for i, role := range req.Roles {
-		if role.RoleType.String() == consts.RoleCommunityAdmin {
+		if role.RoleType.String() == db.RoleCommunityAdmin {
 			id, _ := s.CheckCommunityIdExist(ctx, *role.CommunityId)
 			if id == primitive.NilObjectID {
-				return nil, errorx.ErrCommunityIdNotFound
+				return nil, consts.ErrCommunityIdNotFound
 			}
 		}
 		roles[i] = db.Role{
@@ -386,7 +384,7 @@ func (s *SystemServiceImpl) UpdateUserRole(ctx context.Context, req *system.Upda
 		Roles: roles,
 	})
 	if err != nil {
-		return nil, errorx.Switch(err)
+		return nil, consts.Switch(err)
 	}
 
 	return &system.UpdateUserRoleResp{}, nil
@@ -414,13 +412,13 @@ func (s *SystemServiceImpl) ContainsRole(ctx context.Context, req *system.Contai
 
 	for _, role := range userRole.Roles {
 		switch role.Type {
-		case consts.RoleSuperAdmin:
-			if req.AllowSuperAdmin || req.Role.RoleType.String() == consts.RoleSuperAdmin {
+		case db.RoleSuperAdmin:
+			if req.AllowSuperAdmin || req.Role.RoleType.String() == db.RoleSuperAdmin {
 				resp.Contains = true
 				return
 			}
-		case consts.RoleCommunityAdmin:
-			if req.Role.RoleType.String() == consts.RoleCommunityAdmin &&
+		case db.RoleCommunityAdmin:
+			if req.Role.RoleType.String() == db.RoleCommunityAdmin &&
 				(*req.Role.CommunityId == "" || s.subCommunityOf(ctx, *req.Role.CommunityId, role.CommunityId)) {
 				resp.Contains = true
 				return
@@ -458,7 +456,7 @@ func (s *SystemServiceImpl) HandleApply(ctx context.Context, req *system.HandleA
 			return nil, err
 		}
 		userRole.Roles = append(userRole.Roles, db.Role{
-			Type:        constant.RoleCommunityAdmin,
+			Type:        db.RoleCommunityAdmin,
 			CommunityId: apply.CommunityId,
 		})
 	}
@@ -489,7 +487,7 @@ func (s *SystemServiceImpl) RetrieveCommunity(ctx context.Context, req *system.R
 	community, err := s.CommunityModel.FindOne(ctx, req.Id)
 
 	if err != nil {
-		return nil, errorx.Switch(err)
+		return nil, consts.Switch(err)
 	}
 
 	return &system.RetrieveCommunityResp{
@@ -500,7 +498,7 @@ func (s *SystemServiceImpl) RetrieveCommunity(ctx context.Context, req *system.R
 func (s *SystemServiceImpl) ListCommunity(ctx context.Context, req *system.ListCommunityReq) (resp *system.ListCommunityResp, err error) {
 	communities, count, err := s.CommunityModel.ListCommunity(ctx, req)
 	if err != nil {
-		return nil, errorx.Switch(err)
+		return nil, consts.Switch(err)
 	}
 
 	var res = make([]*system.Community, len(communities))
@@ -542,7 +540,7 @@ func (s *SystemServiceImpl) CreateCommunity(ctx context.Context, req *system.Cre
 func (s *SystemServiceImpl) UpdateCommunity(ctx context.Context, req *system.UpdateCommunityReq) (resp *system.UpdateCommunityResp, err error) {
 	id, err := primitive.ObjectIDFromHex(req.Id)
 	if err != nil {
-		return nil, errorx.ErrInvalidObjectId
+		return nil, consts.ErrInvalidObjectId
 	}
 
 	parentId, err := s.CheckParentCommunityId(ctx, req.ParentId)
@@ -557,7 +555,7 @@ func (s *SystemServiceImpl) UpdateCommunity(ctx context.Context, req *system.Upd
 	})
 
 	if err != nil {
-		return nil, errorx.Switch(err)
+		return nil, consts.Switch(err)
 	}
 
 	return &system.UpdateCommunityResp{}, nil
@@ -567,7 +565,7 @@ func (s *SystemServiceImpl) DeleteCommunity(ctx context.Context, req *system.Del
 	err = s.CommunityModel.DeleteCommunity(ctx, req.Id)
 
 	if err != nil {
-		return nil, errorx.Switch(err)
+		return nil, consts.Switch(err)
 	}
 
 	return &system.DeleteCommunityResp{}, nil

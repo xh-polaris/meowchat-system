@@ -8,7 +8,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"meowchat-system/biz/infrastructure/config"
-	"meowchat-system/biz/infrastructure/consts"
 	"meowchat-system/biz/infrastructure/data/db"
 	"time"
 )
@@ -47,15 +46,15 @@ func (m CustomUserRoleModel) FindMany(ctx context.Context, role string, communit
 	var resp []*db.UserRole
 
 	switch role {
-	case consts.RoleDeveloper:
+	case db.RoleDeveloper:
 		fallthrough
-	case consts.RoleSuperAdmin:
+	case db.RoleSuperAdmin:
 		err := m.conn.Find(ctx, &resp, bson.M{"roles.type": role})
 		if err != nil {
 			return nil, err
 		}
 		return resp, nil
-	case consts.RoleCommunityAdmin:
+	case db.RoleCommunityAdmin:
 		err := m.conn.Find(ctx, &resp, bson.M{"roles.type": role, "roles.communityId": communityId})
 		if err != nil {
 			return nil, err
