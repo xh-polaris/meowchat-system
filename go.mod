@@ -3,7 +3,7 @@ module meowchat-system
 go 1.19
 
 require (
-	github.com/cloudwego/hertz v0.6.6
+	github.com/cloudwego/hertz v0.6.7
 	github.com/cloudwego/kitex v0.6.2
 	github.com/google/wire v0.5.0
 	github.com/kitex-contrib/obs-opentelemetry v0.2.3
