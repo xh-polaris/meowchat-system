@@ -6,7 +6,6 @@ import (
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/util"
-	"github.com/xh-polaris/meowchat-system/biz/infrastructure/util/log"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
@@ -16,11 +15,18 @@ import (
 
 var (
 	RoleTypeValue = map[string]system.RoleType{
-		"unknown":        system.RoleType_unknown,
-		"user":           system.RoleType_user,
-		"communityAdmin": system.RoleType_communityAdmin,
-		"superAdmin":     system.RoleType_superAdmin,
-		"developer":      system.RoleType_developer,
+		"unknown":        system.RoleType_TypeUnknown,
+		"user":           system.RoleType_TypeNormalUser,
+		"communityAdmin": system.RoleType_TypeCommunityAdmin,
+		"superAdmin":     system.RoleType_TypeSuperAdmin,
+		"developer":      system.RoleType_TypeDeveloper,
+	}
+	RoleTypeName = map[system.RoleType]string{
+		system.RoleType_TypeUnknown:        "unknown",
+		system.RoleType_TypeNormalUser:     "user",
+		system.RoleType_TypeCommunityAdmin: "communityAdmin",
+		system.RoleType_TypeSuperAdmin:     "superAdmin",
+		system.RoleType_TypeDeveloper:      "developer",
 	}
 )
 
@@ -321,7 +327,6 @@ func (s *SystemServiceImpl) RetrieveUserRole(ctx context.Context, req *system.Re
 
 	var res = make([]*system.Role, len(userRole.Roles))
 	for i, role := range userRole.Roles {
-		log.Info(RoleTypeValue[role.Type].String())
 		res[i] = &system.Role{
 			RoleType:    RoleTypeValue[role.Type],
 			CommunityId: &role.CommunityId,
@@ -334,7 +339,7 @@ func (s *SystemServiceImpl) RetrieveUserRole(ctx context.Context, req *system.Re
 }
 
 func (s *SystemServiceImpl) ListUserIdByRole(ctx context.Context, req *system.ListUserIdByRoleReq) (resp *system.ListUserIdByRoleResp, err error) {
-	Users, err := s.UserRoleModel.FindMany(ctx, req.Role.RoleType.String(), *req.Role.CommunityId)
+	Users, err := s.UserRoleModel.FindMany(ctx, RoleTypeName[req.Role.RoleType], *req.Role.CommunityId)
 
 	if err != nil {
 		switch err {
@@ -367,14 +372,14 @@ func (s *SystemServiceImpl) UpdateUserRole(ctx context.Context, req *system.Upda
 
 	roles := make([]db.Role, len(req.Roles))
 	for i, role := range req.Roles {
-		if role.RoleType.String() == db.RoleCommunityAdmin {
+		if RoleTypeName[role.RoleType] == db.RoleCommunityAdmin {
 			id, _ := s.CheckCommunityIdExist(ctx, *role.CommunityId)
 			if id == primitive.NilObjectID {
 				return nil, consts.ErrCommunityIdNotFound
 			}
 		}
 		roles[i] = db.Role{
-			Type:        role.RoleType.String(),
+			Type:        RoleTypeName[role.RoleType],
 			CommunityId: *role.CommunityId,
 		}
 	}
@@ -413,18 +418,18 @@ func (s *SystemServiceImpl) ContainsRole(ctx context.Context, req *system.Contai
 	for _, role := range userRole.Roles {
 		switch role.Type {
 		case db.RoleSuperAdmin:
-			if req.AllowSuperAdmin || req.Role.RoleType.String() == db.RoleSuperAdmin {
+			if req.AllowSuperAdmin || RoleTypeName[req.Role.RoleType] == db.RoleSuperAdmin {
 				resp.Contains = true
 				return
 			}
 		case db.RoleCommunityAdmin:
-			if req.Role.RoleType.String() == db.RoleCommunityAdmin &&
+			if RoleTypeName[req.Role.RoleType] == db.RoleCommunityAdmin &&
 				(*req.Role.CommunityId == "" || s.subCommunityOf(ctx, *req.Role.CommunityId, role.CommunityId)) {
 				resp.Contains = true
 				return
 			}
 		default:
-			if req.Role.RoleType.String() == role.Type {
+			if RoleTypeName[req.Role.RoleType] == role.Type {
 				resp.Contains = true
 				return
 			}
