@@ -7,7 +7,8 @@ require (
 	github.com/cloudwego/kitex v0.6.2
 	github.com/google/wire v0.5.0
 	github.com/kitex-contrib/obs-opentelemetry v0.2.3
-	github.com/xh-polaris/service-idl-gen-go v0.0.0-20230805104458-ba145d62700b
+	github.com/xh-polaris/gopkg v0.0.0-20230915071845-b0ecd425cb58
+	github.com/xh-polaris/service-idl-gen-go v0.0.0-20230909174338-cc6ca6a20ce5
 	github.com/zeromicro/go-zero v1.5.4
 	go.mongodb.org/mongo-driver v1.12.1
 	google.golang.org/grpc v1.57.0
@@ -26,6 +27,7 @@ require (
 	github.com/cloudwego/configmanager v0.2.0 // indirect
 	github.com/cloudwego/fastpb v0.0.4 // indirect
 	github.com/cloudwego/frugal v0.1.6 // indirect
+	github.com/cloudwego/hertz v0.6.6 // indirect
 	github.com/cloudwego/netpoll v0.4.1 // indirect
 	github.com/cloudwego/thriftgo v0.2.11 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -55,9 +57,9 @@ require (
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.10.1 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
-	github.com/tidwall/gjson v1.13.0 // indirect
+	github.com/tidwall/gjson v1.14.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
-	github.com/tidwall/pretty v1.2.0 // indirect
+	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
