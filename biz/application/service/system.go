@@ -2,13 +2,15 @@ package service
 
 import (
 	"context"
+	"time"
+
+	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/consts"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/util"
-	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"time"
 
 	"github.com/google/wire"
 )
@@ -380,7 +382,7 @@ func (s *SystemServiceImpl) UpdateUserRole(ctx context.Context, req *system.Upda
 		}
 		roles[i] = db.Role{
 			Type:        RoleTypeName[role.RoleType],
-			CommunityId: *role.CommunityId,
+			CommunityId: role.GetCommunityId(),
 		}
 	}
 
