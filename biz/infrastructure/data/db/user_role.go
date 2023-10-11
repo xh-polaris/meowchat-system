@@ -13,7 +13,7 @@ type Role struct {
 
 type UserRole struct {
 	ID       primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
-	Roles    []Role             `bson:"roles,omitempty" json:"roles,omitempty"`
+	Roles    []*Role            `bson:"roles,omitempty" json:"roles,omitempty"`
 	UpdateAt time.Time          `bson:"updateAt,omitempty" json:"updateAt,omitempty"`
 	CreateAt time.Time          `bson:"createAt,omitempty" json:"createAt,omitempty"`
 }

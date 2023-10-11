@@ -372,7 +372,7 @@ func (s *SystemServiceImpl) UpdateUserRole(ctx context.Context, req *system.Upda
 		return nil, consts.ErrInvalidObjectId
 	}
 
-	roles := make([]db.Role, len(req.Roles))
+	roles := make([]*db.Role, len(req.Roles))
 	for i, role := range req.Roles {
 		if RoleTypeName[role.RoleType] == db.RoleCommunityAdmin {
 			id, _ := s.CheckCommunityIdExist(ctx, *role.CommunityId)
@@ -380,7 +380,7 @@ func (s *SystemServiceImpl) UpdateUserRole(ctx context.Context, req *system.Upda
 				return nil, consts.ErrCommunityIdNotFound
 			}
 		}
-		roles[i] = db.Role{
+		roles[i] = &db.Role{
 			Type:        RoleTypeName[role.RoleType],
 			CommunityId: role.GetCommunityId(),
 		}
@@ -462,7 +462,7 @@ func (s *SystemServiceImpl) HandleApply(ctx context.Context, req *system.HandleA
 		if err != nil {
 			return nil, err
 		}
-		userRole.Roles = append(userRole.Roles, db.Role{
+		userRole.Roles = append(userRole.Roles, &db.Role{
 			Type:        db.RoleCommunityAdmin,
 			CommunityId: apply.CommunityId,
 		})
