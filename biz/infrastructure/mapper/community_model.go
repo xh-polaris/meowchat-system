@@ -2,13 +2,18 @@ package mapper
 
 import (
 	"context"
+	"errors"
+	"time"
+
 	"github.com/google/wire"
-	"github.com/xh-polaris/meowchat-system/biz/infrastructure/config"
-	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/config"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
 )
 
 const CommunityCollectionName = "community"
@@ -22,6 +27,7 @@ type (
 		communityModel
 		ListCommunity(ctx context.Context, req *system.ListCommunityReq) ([]*db.Community, int64, error)
 		DeleteCommunity(ctx context.Context, id string) error
+		InsertRoot(ctx context.Context, data *db.Community) error
 	}
 
 	CustomCommunityModel struct {
@@ -29,7 +35,41 @@ type (
 	}
 )
 
-func (c CustomCommunityModel) DeleteCommunity(ctx context.Context, id string) error {
+func (m *CustomCommunityModel) InsertRoot(ctx context.Context, data *db.Community) error {
+	if !data.ParentId.IsZero() {
+		return errors.New("not root community")
+	}
+	if data.ID.IsZero() {
+		data.ID = primitive.NewObjectID()
+		data.CreateAt = time.Now()
+		data.UpdateAt = time.Now()
+	}
+
+	s, err := m.conn.StartSession()
+	if err != nil {
+		return err
+	}
+	_, err = s.WithTransaction(ctx, func(ctx mongo.SessionContext) (interface{}, error) {
+		_, err = m.conn.InsertOne(ctx, prefixCommunityCacheKey+data.ID.Hex(), data)
+		if err != nil {
+			return nil, err
+		}
+		data.ParentId = data.ID
+		data.ID = primitive.NewObjectID()
+		_, err = m.conn.InsertOne(ctx, prefixCommunityCacheKey+data.ID.Hex(), data)
+		if err != nil {
+			return nil, err
+		}
+		return nil, nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CustomCommunityModel) DeleteCommunity(ctx context.Context, id string) error {
 	key := prefixCommunityCacheKey + id
 
 	old := new(db.Community)
@@ -37,13 +77,13 @@ func (c CustomCommunityModel) DeleteCommunity(ctx context.Context, id string) er
 	if err != nil {
 		return err
 	}
-	err = c.conn.FindOneAndDelete(ctx, key, old, bson.M{"_id": oid})
+	err = m.conn.FindOneAndDelete(ctx, key, old, bson.M{"_id": oid})
 	if err != nil {
 		return err
 	}
 
 	// delete children
-	_, err = c.conn.DeleteMany(ctx, bson.M{
+	_, err = m.conn.DeleteMany(ctx, bson.M{
 		"parentId": old.ID,
 	})
 	if err != nil {
@@ -51,14 +91,14 @@ func (c CustomCommunityModel) DeleteCommunity(ctx context.Context, id string) er
 	}
 
 	// delete all cache
-	err = c.conn.DelCache(ctx, prefixCommunityCacheKey+"*")
+	err = m.conn.DelCache(ctx, prefixCommunityCacheKey+"*")
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (c CustomCommunityModel) ListCommunity(ctx context.Context, req *system.ListCommunityReq) ([]*db.Community, int64, error) {
+func (m *CustomCommunityModel) ListCommunity(ctx context.Context, req *system.ListCommunityReq) ([]*db.Community, int64, error) {
 	var resp []*db.Community
 
 	filter := bson.M{}
@@ -71,12 +111,12 @@ func (c CustomCommunityModel) ListCommunity(ctx context.Context, req *system.Lis
 
 	findOptions := ToFindOptions(req.Page, req.PageSize, req.Sort)
 
-	err := c.conn.Find(ctx, &resp, filter, findOptions)
+	err := m.conn.Find(ctx, &resp, filter, findOptions)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	count, err := c.conn.CountDocuments(ctx, filter)
+	count, err := m.conn.CountDocuments(ctx, filter)
 	if err != nil {
 		return nil, 0, err
 	}

@@ -520,27 +520,26 @@ func (s *SystemServiceImpl) ListCommunity(ctx context.Context, req *system.ListC
 }
 
 func (s *SystemServiceImpl) CreateCommunity(ctx context.Context, req *system.CreateCommunityReq) (resp *system.CreateCommunityResp, err error) {
-	id := primitive.NewObjectID()
-
 	parentId, err := s.CheckParentCommunityId(ctx, req.ParentId)
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.CommunityModel.Insert(ctx, &db.Community{
-		ID:       id,
+	community := &db.Community{
 		Name:     req.Name,
 		ParentId: parentId,
-		CreateAt: time.Now(),
-		UpdateAt: time.Now(),
-	})
-
+	}
+	if parentId.IsZero() {
+		err = s.CommunityModel.InsertRoot(ctx, community)
+	} else {
+		err = s.CommunityModel.Insert(ctx, community)
+	}
 	if err != nil {
 		return nil, err
 	}
 
 	return &system.CreateCommunityResp{
-		Id: id.Hex(),
+		Id: community.ID.Hex(),
 	}, nil
 }
 
