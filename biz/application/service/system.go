@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/samber/lo"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
@@ -326,12 +327,11 @@ func (s *SystemServiceImpl) RetrieveUserRole(ctx context.Context, req *system.Re
 			return nil, err
 		}
 	}
-
 	var res = make([]*system.Role, len(userRole.Roles))
 	for i, role := range userRole.Roles {
 		res[i] = &system.Role{
 			RoleType:    RoleTypeValue[role.Type],
-			CommunityId: &role.CommunityId,
+			CommunityId: lo.EmptyableToPtr(role.CommunityId),
 		}
 	}
 
