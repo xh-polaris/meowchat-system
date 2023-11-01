@@ -4,9 +4,10 @@ go 1.19
 
 require (
 	github.com/bytedance/sonic v1.10.1
-	github.com/cloudwego/kitex v0.7.2
+	github.com/cloudwego/kitex v0.7.3
 	github.com/google/wire v0.5.0
 	github.com/kitex-contrib/obs-opentelemetry v0.2.3
+	github.com/samber/lo v1.38.1
 	github.com/xh-polaris/gopkg v0.0.0-20230915071845-b0ecd425cb58
 	github.com/xh-polaris/service-idl-gen-go v0.0.0-20230909174338-cc6ca6a20ce5
 	github.com/zeromicro/go-zero v1.5.6
@@ -30,8 +31,8 @@ require (
 	github.com/cloudwego/frugal v0.1.8 // indirect
 	github.com/cloudwego/hertz v0.6.6 // indirect
 	github.com/cloudwego/localsession v0.0.2 // indirect
-	github.com/cloudwego/netpoll v0.5.0 // indirect
-	github.com/cloudwego/thriftgo v0.3.0 // indirect
+	github.com/cloudwego/netpoll v0.5.1 // indirect
+	github.com/cloudwego/thriftgo v0.3.2-0.20230828085742-edaddf2c17af // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fatih/color v1.15.0 // indirect
@@ -63,7 +64,6 @@ require (
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.10.1 // indirect
-	github.com/samber/lo v1.38.1 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
 	github.com/tidwall/gjson v1.14.4 // indirect
