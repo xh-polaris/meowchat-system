@@ -2,6 +2,7 @@ package adaptor
 
 import (
 	"context"
+
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 
 	"github.com/xh-polaris/meowchat-system/biz/application/service"
@@ -11,6 +12,22 @@ import (
 type SystemServerImpl struct {
 	*config.Config
 	SystemService service.SystemService
+}
+
+func (s *SystemServerImpl) ListNotification(ctx context.Context, req *system.ListNotificationReq) (resp *system.ListNotificationResp, rr error) {
+	return s.SystemService.ListNotification(ctx, req)
+}
+
+func (s *SystemServerImpl) CountNotification(ctx context.Context, req *system.CountNotificationReq) (resp *system.CountNotificationResp, rr error) {
+	return s.SystemService.CountNotification(ctx, req)
+}
+
+func (s *SystemServerImpl) CleanNotification(ctx context.Context, req *system.CleanNotificationReq) (resp *system.CleanNotificationResp, rr error) {
+	return s.SystemService.CleanNotification(ctx, req)
+}
+
+func (s *SystemServerImpl) ReadNotification(ctx context.Context, req *system.ReadNotificationReq) (resp *system.ReadNotificationResp, rr error) {
+	return s.SystemService.ReadNotification(ctx, req)
 }
 
 func (s *SystemServerImpl) RetrieveNotice(ctx context.Context, req *system.RetrieveNoticeReq) (resp *system.RetrieveNoticeResp, rr error) {

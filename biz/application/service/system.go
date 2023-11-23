@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/apache/rocketmq-client-go/v2"
 	"github.com/samber/lo"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -61,15 +62,21 @@ type SystemService interface {
 	CreateCommunity(ctx context.Context, req *system.CreateCommunityReq) (resp *system.CreateCommunityResp, err error)
 	UpdateCommunity(ctx context.Context, req *system.UpdateCommunityReq) (resp *system.UpdateCommunityResp, err error)
 	DeleteCommunity(ctx context.Context, req *system.DeleteCommunityReq) (resp *system.DeleteCommunityResp, err error)
+	ListNotification(ctx context.Context, req *system.ListNotificationReq) (resp *system.ListNotificationResp, err error)
+	CountNotification(ctx context.Context, req *system.CountNotificationReq) (resp *system.CountNotificationResp, err error)
+	CleanNotification(ctx context.Context, req *system.CleanNotificationReq) (resp *system.CleanNotificationResp, err error)
+	ReadNotification(ctx context.Context, req *system.ReadNotificationReq) (resp *system.ReadNotificationResp, err error)
 }
 
 type SystemServiceImpl struct {
-	AdminModel     mapper.AdminModel
-	ApplyModel     mapper.ApplyModel
-	CommunityModel mapper.CommunityModel
-	NewsModel      mapper.NewsModel
-	NoticeModel    mapper.NoticeModel
-	UserRoleModel  mapper.UserRoleModel
+	AdminModel        mapper.AdminModel
+	ApplyModel        mapper.ApplyModel
+	CommunityModel    mapper.CommunityModel
+	NewsModel         mapper.NewsModel
+	NoticeModel       mapper.NoticeModel
+	UserRoleModel     mapper.UserRoleModel
+	NotificationModel mapper.NotificationModel
+	MqConsumer        rocketmq.PushConsumer
 }
 
 var SystemSet = wire.NewSet(
@@ -575,4 +582,45 @@ func (s *SystemServiceImpl) DeleteCommunity(ctx context.Context, req *system.Del
 	}
 
 	return &system.DeleteCommunityResp{}, nil
+}
+
+func (s *SystemServiceImpl) ListNotification(ctx context.Context, req *system.ListNotificationReq) (resp *system.ListNotificationResp, err error) {
+	notification, total, err := s.NotificationModel.ListNotification(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	notRead, err := s.NotificationModel.CountNotification(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &system.ListNotificationResp{
+		Notifications: util.ConvertNotifications(notification),
+		NotRead:       notRead,
+		Total:         total,
+	}, nil
+}
+
+func (s *SystemServiceImpl) CountNotification(ctx context.Context, req *system.CountNotificationReq) (resp *system.CountNotificationResp, err error) {
+	notRead, err := s.NotificationModel.CountNotification(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &system.CountNotificationResp{NotificationCount: notRead}, err
+}
+
+func (s *SystemServiceImpl) CleanNotification(ctx context.Context, req *system.CleanNotificationReq) (resp *system.CleanNotificationResp, err error) {
+	err = s.NotificationModel.CleanNotification(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &system.CleanNotificationResp{}, nil
+}
+
+func (s *SystemServiceImpl) ReadNotification(ctx context.Context, req *system.ReadNotificationReq) (resp *system.ReadNotificationResp, err error) {
+	err = s.NotificationModel.ReadNotification(ctx, req.NotificationId)
+	if err != nil {
+		return nil, err
+	}
+	return &system.ReadNotificationResp{}, nil
 }

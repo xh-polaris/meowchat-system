@@ -1,11 +1,12 @@
 package config
 
 import (
+	"os"
+
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/redis"
-	"os"
 )
 
 type Config struct {
@@ -17,6 +18,11 @@ type Config struct {
 	}
 	CacheConf cache.CacheConf
 	RedisConf redis.RedisConf
+	RocketMq  *struct {
+		URL       []string
+		Retry     int
+		GroupName string
+	}
 }
 
 func NewConfig() (*Config, error) {
