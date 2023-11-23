@@ -8,6 +8,7 @@ import (
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/config"
@@ -45,10 +46,13 @@ func (m customNotificationModel) ListNotification(ctx context.Context, req *syst
 	var resp []*db.Notification
 
 	filter := bson.M{
-		"userId": req.UserId,
+		TargetUserId: req.UserId,
 	}
 
-	sort := bson.E{Key: CreateAt, Value: -1}
+	sort := bson.D{
+		bson.E{IsRead, 1},
+		bson.E{CreateAt, -1},
+	}
 
 	findOptions := &options.FindOptions{
 		Limit: req.PaginationOptions.Limit,
@@ -73,22 +77,27 @@ func (m customNotificationModel) CleanNotification(ctx context.Context, userId s
 
 	filter := bson.M{
 		TargetUserId: userId,
-		IsRead:       false,
+		IsRead:       bson.M{"$exists": false},
 	}
 	_, err := m.conn.UpdateManyNoCache(ctx, filter, bson.M{"$set": bson.M{IsRead: true, UpdateAt: time.Now()}})
 	return err
 }
 
 func (m customNotificationModel) ReadNotification(ctx context.Context, notificationId string) error {
+	oid, err := primitive.ObjectIDFromHex(notificationId)
+	if err != nil {
+		return ErrInvalidObjectId
+	}
+
 	key := prefixNotificationCacheKey + notificationId
-	_, err := m.conn.UpdateByID(ctx, key, notificationId, bson.M{"$set": bson.M{IsRead: true, UpdateAt: time.Now()}})
+	_, err = m.conn.UpdateByID(ctx, key, oid, bson.M{"$set": bson.M{IsRead: true, UpdateAt: time.Now()}})
 	return err
 }
 
 func (m customNotificationModel) CountNotification(ctx context.Context, userId string) (int64, error) {
 	filter := bson.M{
 		TargetUserId: userId,
-		IsRead:       false,
+		IsRead:       bson.M{"$exists": false},
 	}
 	return m.conn.CountDocuments(ctx, filter)
 }
