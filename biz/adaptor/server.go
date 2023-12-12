@@ -137,3 +137,7 @@ func (s *SystemServerImpl) UpdateCommunity(ctx context.Context, req *system.Upda
 func (s *SystemServerImpl) DeleteCommunity(ctx context.Context, req *system.DeleteCommunityReq) (resp *system.DeleteCommunityResp, rr error) {
 	return s.SystemService.DeleteCommunity(ctx, req)
 }
+
+func (s *SystemServerImpl) AddNotification(ctx context.Context, req *system.AddNotificationReq) (resp *system.AddNotificationResp, rr error) {
+	return s.SystemService.AddNotification(ctx, req)
+}

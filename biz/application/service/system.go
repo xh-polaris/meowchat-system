@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/apache/rocketmq-client-go/v2"
 	"github.com/samber/lo"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -66,6 +65,7 @@ type SystemService interface {
 	CountNotification(ctx context.Context, req *system.CountNotificationReq) (resp *system.CountNotificationResp, err error)
 	CleanNotification(ctx context.Context, req *system.CleanNotificationReq) (resp *system.CleanNotificationResp, err error)
 	ReadNotification(ctx context.Context, req *system.ReadNotificationReq) (resp *system.ReadNotificationResp, err error)
+	AddNotification(ctx context.Context, req *system.AddNotificationReq) (resp *system.AddNotificationResp, err error)
 }
 
 type SystemServiceImpl struct {
@@ -76,7 +76,6 @@ type SystemServiceImpl struct {
 	NoticeModel       mapper.NoticeModel
 	UserRoleModel     mapper.UserRoleModel
 	NotificationModel mapper.NotificationModel
-	MqConsumer        rocketmq.PushConsumer
 }
 
 var SystemSet = wire.NewSet(
@@ -623,4 +622,22 @@ func (s *SystemServiceImpl) ReadNotification(ctx context.Context, req *system.Re
 		return nil, err
 	}
 	return &system.ReadNotificationResp{}, nil
+}
+
+func (s *SystemServiceImpl) AddNotification(ctx context.Context, req *system.AddNotificationReq) (resp *system.AddNotificationResp, err error) {
+	notification := &db.Notification{
+		TargetUserId:    req.Notification.GetTargetUserId(),
+		SourceUserId:    req.Notification.GetSourceUserId(),
+		SourceContentId: req.Notification.GetSourceContentId(),
+		Type:            req.Notification.GetType(),
+		Text:            req.Notification.GetText(),
+		IsRead:          req.Notification.GetIsRead(),
+		CreateAt:        time.Now(),
+		UpdateAt:        time.Now(),
+	}
+	err = s.NotificationModel.Insert(context.Background(), notification)
+	if err != nil {
+		return nil, err
+	}
+	return &system.AddNotificationResp{}, nil
 }

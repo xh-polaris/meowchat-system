@@ -6,7 +6,6 @@ import (
 	"github.com/xh-polaris/meowchat-system/biz/application/service"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/config"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper"
-	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mq"
 )
 
 var AllProvider = wire.NewSet(
@@ -20,7 +19,6 @@ var ApplicationSet = wire.NewSet(
 
 var InfrastructureSet = wire.NewSet(
 	config.NewConfig,
-	mq.NewMqConsumer,
 	MapperSet,
 )
 

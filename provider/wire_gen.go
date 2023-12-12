@@ -11,7 +11,6 @@ import (
 	"github.com/xh-polaris/meowchat-system/biz/application/service"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/config"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper"
-	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mq"
 )
 
 // Injectors from wire.go:
@@ -28,7 +27,6 @@ func NewSystemServerImpl() (*adaptor.SystemServerImpl, error) {
 	noticeModel := mapper.NewNoticeModel(configConfig)
 	userRoleModel := mapper.NewUserRoleModel(configConfig)
 	notificationModel := mapper.NewNotificationModel(configConfig)
-	pushConsumer := mq.NewMqConsumer(configConfig)
 	systemServiceImpl := &service.SystemServiceImpl{
 		AdminModel:        adminModel,
 		ApplyModel:        applyModel,
@@ -37,7 +35,6 @@ func NewSystemServerImpl() (*adaptor.SystemServerImpl, error) {
 		NoticeModel:       noticeModel,
 		UserRoleModel:     userRoleModel,
 		NotificationModel: notificationModel,
-		MqConsumer:        pushConsumer,
 	}
 	systemServerImpl := &adaptor.SystemServerImpl{
 		Config:        configConfig,
