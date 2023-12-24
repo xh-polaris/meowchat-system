@@ -593,12 +593,16 @@ func (s *SystemServiceImpl) DeleteCommunity(ctx context.Context, req *system.Del
 }
 
 func (s *SystemServiceImpl) ListNotification(ctx context.Context, req *system.ListNotificationReq) (resp *system.ListNotificationResp, err error) {
+	resp = new(system.ListNotificationResp)
 
-	notification, total, err := s.NotificationModel.ListNotification(ctx, req, mongop.IdCursorType)
+	var notifications []*db.Notification
+	filter := util.ParseNotificationFilter(req)
+	p := util.ParsePagination(req.PaginationOptions)
+	notifications, resp.Total, err = s.NotificationModel.ListNotification(ctx, filter, p, mongop.IdCursorType)
 	if err != nil {
 		return nil, err
 	}
-	notRead, err := s.NotificationModel.CountNotification(ctx, &system.CountNotificationReq{
+	resp.NotRead, err = s.NotificationModel.CountNotification(ctx, &system.CountNotificationReq{
 		UserId:     req.GetUserId(),
 		Type:       req.Type,
 		TargetType: req.TargetType,
@@ -607,11 +611,11 @@ func (s *SystemServiceImpl) ListNotification(ctx context.Context, req *system.Li
 		return nil, err
 	}
 
-	return &system.ListNotificationResp{
-		Notifications: util.ConvertNotifications(notification),
-		NotRead:       notRead,
-		Total:         total,
-	}, nil
+	if p.LastToken != nil {
+		resp.Token = *p.LastToken
+	}
+	resp.Notifications = util.ConvertNotifications(notifications)
+	return resp, nil
 }
 
 func (s *SystemServiceImpl) CountNotification(ctx context.Context, req *system.CountNotificationReq) (resp *system.CountNotificationResp, err error) {

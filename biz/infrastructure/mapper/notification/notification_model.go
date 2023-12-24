@@ -17,7 +17,6 @@ import (
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/consts"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper"
-	"github.com/xh-polaris/meowchat-system/biz/infrastructure/util"
 )
 
 const (
@@ -31,7 +30,7 @@ type (
 	// and implement the added methods in customNotificationModel.
 	NotificationModel interface {
 		notificationModel
-		ListNotification(ctx context.Context, req *system.ListNotificationReq, sorter mongop.MongoCursor) ([]*db.Notification, int64, error)
+		ListNotification(ctx context.Context, fopts *FilterOptions, popts *pagination.PaginationOptions, sorter mongop.MongoCursor) ([]*db.Notification, int64, error)
 		CleanNotification(ctx context.Context, userId string) error
 		ReadNotification(ctx context.Context, notificationId string) error
 		CountNotification(ctx context.Context, req *system.CountNotificationReq) (int64, error)
@@ -43,16 +42,11 @@ type (
 	}
 )
 
-func (m customNotificationModel) ListNotification(ctx context.Context, req *system.ListNotificationReq, sorter mongop.MongoCursor) ([]*db.Notification, int64, error) {
+func (m customNotificationModel) ListNotification(ctx context.Context, fopts *FilterOptions, popts *pagination.PaginationOptions, sorter mongop.MongoCursor) ([]*db.Notification, int64, error) {
 	var data []*db.Notification
-	popts := util.ParsePagination(req.GetPaginationOptions())
 	p := mongop.NewMongoPaginator(pagination.NewRawStore(sorter), popts)
-	f := &FilterOptions{
-		OnlyUserId:     req.UserId,
-		OnlyType:       req.Type,
-		OnlyTargetType: req.TargetType,
-	}
-	filter := makeMongoFilter(f)
+
+	filter := makeMongoFilter(fopts)
 	sort, err := p.MakeSortOptions(ctx, filter)
 	if err != nil {
 		return nil, 0, err
@@ -60,8 +54,8 @@ func (m customNotificationModel) ListNotification(ctx context.Context, req *syst
 
 	if err = m.conn.Find(ctx, &data, filter, &options.FindOptions{
 		Sort:  sort,
-		Limit: req.PaginationOptions.Limit,
-		Skip:  req.PaginationOptions.Offset,
+		Limit: popts.Limit,
+		Skip:  popts.Offset,
 	}); err != nil {
 		return nil, 0, err
 	}

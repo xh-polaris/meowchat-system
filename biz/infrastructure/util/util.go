@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper/notification"
 )
 
 func ConvertAdmin(in *db.Admin) *system.Admin {
@@ -113,4 +114,17 @@ func ParallelRun(fns ...func()) {
 		})
 	}
 	wg.Wait()
+}
+
+func ParseNotificationFilter(req *system.ListNotificationReq) (filter *notification.FilterOptions) {
+	if req == nil {
+		filter = &notification.FilterOptions{}
+	} else {
+		filter = &notification.FilterOptions{
+			OnlyUserId:     req.UserId,
+			OnlyType:       req.Type,
+			OnlyTargetType: req.TargetType,
+		}
+	}
+	return
 }
