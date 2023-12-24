@@ -141,3 +141,7 @@ func (s *SystemServerImpl) DeleteCommunity(ctx context.Context, req *system.Dele
 func (s *SystemServerImpl) AddNotification(ctx context.Context, req *system.AddNotificationReq) (resp *system.AddNotificationResp, rr error) {
 	return s.SystemService.AddNotification(ctx, req)
 }
+
+func (s *SystemServerImpl) ReadRangeNotification(ctx context.Context, req *system.ReadRangeNotificationReq) (resp *system.ReadRangeNotificationResp, rr error) {
+	return s.SystemService.ReadRangeNotification(ctx, req)
+}

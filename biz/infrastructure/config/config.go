@@ -18,11 +18,6 @@ type Config struct {
 	}
 	CacheConf cache.CacheConf
 	RedisConf redis.RedisConf
-	RocketMq  *struct {
-		URL       []string
-		Retry     int
-		GroupName string
-	}
 }
 
 func NewConfig() (*Config, error) {

@@ -1,15 +1,18 @@
-package mapper
+package admin
 
 import (
 	"context"
+
 	"github.com/google/wire"
-	"github.com/xh-polaris/meowchat-system/biz/infrastructure/config"
-	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/config"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper"
 )
 
 const AdminCollectionName = "admin"
@@ -35,7 +38,7 @@ func (m customAdminModel) UpdateAdmin(ctx context.Context, req *system.UpdateAdm
 
 	oid, err := primitive.ObjectIDFromHex(req.Id)
 	if err != nil {
-		return ErrInvalidObjectId
+		return mapper.ErrInvalidObjectId
 	}
 
 	filter := bson.M{
@@ -68,7 +71,7 @@ func (m customAdminModel) ListAdmin(ctx context.Context, req *system.ListAdminRe
 	filter := bson.M{
 		"communityId": req.CommunityId,
 	}
-	findOptions := ToFindOptions(req.Page, req.PageSize, req.Sort)
+	findOptions := mapper.ToFindOptions(req.Page, req.PageSize, req.Sort)
 
 	err := m.conn.Find(ctx, &resp, filter, findOptions)
 	if err != nil {

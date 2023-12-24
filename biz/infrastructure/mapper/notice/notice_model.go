@@ -1,10 +1,14 @@
-package mapper
+package notice
 
 import (
 	"context"
+
 	"github.com/google/wire"
+
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/config"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper"
+
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"go.mongodb.org/mongo-driver/bson"
@@ -34,7 +38,7 @@ func (m customNoticeModel) UpdateNotice(ctx context.Context, req *system.UpdateN
 
 	oid, err := primitive.ObjectIDFromHex(req.Id)
 	if err != nil {
-		return ErrInvalidObjectId
+		return mapper.ErrInvalidObjectId
 	}
 
 	filter := bson.M{
@@ -56,7 +60,7 @@ func (m customNoticeModel) ListNotice(ctx context.Context, req *system.ListNotic
 	filter := bson.M{
 		"communityId": req.CommunityId,
 	}
-	findOptions := ToFindOptions(req.Page, req.PageSize, req.Sort)
+	findOptions := mapper.ToFindOptions(req.Page, req.PageSize, req.Sort)
 
 	err := m.conn.Find(ctx, &resp, filter, findOptions)
 	if err != nil {

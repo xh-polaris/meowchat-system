@@ -1,16 +1,20 @@
-package mapper
+package news
 
 import (
 	"context"
+	"time"
+
 	"github.com/google/wire"
+
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/config"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper"
+
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 	"github.com/zeromicro/go-zero/core/stores/monc"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 )
 
 const NewsCollectionName = "news"
@@ -40,7 +44,7 @@ func (m customNewsModel) ListNews(ctx context.Context, req *system.ListNewsReq) 
 			{"isPublic": 1},
 		},
 	}
-	findOptions := ToFindOptions(req.Page, req.PageSize, req.Sort)
+	findOptions := mapper.ToFindOptions(req.Page, req.PageSize, req.Sort)
 
 	err := m.conn.Find(ctx, &resp, filter, findOptions)
 	if err != nil {
@@ -60,7 +64,7 @@ func (m customNewsModel) UpdateNews(ctx context.Context, req *system.UpdateNewsR
 
 	oid, err := primitive.ObjectIDFromHex(req.Id)
 	if err != nil {
-		return ErrInvalidObjectId
+		return mapper.ErrInvalidObjectId
 	}
 
 	filter := bson.M{

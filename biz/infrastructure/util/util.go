@@ -1,6 +1,11 @@
 package util
 
 import (
+	"sync"
+
+	"github.com/bytedance/gopkg/util/gopool"
+	"github.com/xh-polaris/gopkg/pagination"
+	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/basic"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
@@ -81,4 +86,31 @@ func ConvertNotifications(in []*db.Notification) []*system.Notification {
 		})
 	}
 	return res
+}
+
+func ParsePagination(opts *basic.PaginationOptions) (p *pagination.PaginationOptions) {
+	if opts == nil {
+		p = &pagination.PaginationOptions{}
+	} else {
+		p = &pagination.PaginationOptions{
+			Limit:     opts.Limit,
+			Offset:    opts.Offset,
+			Backward:  opts.Backward,
+			LastToken: opts.LastToken,
+		}
+	}
+	return
+}
+
+func ParallelRun(fns ...func()) {
+	wg := sync.WaitGroup{}
+	wg.Add(len(fns))
+	for _, fn := range fns {
+		fn := fn
+		gopool.Go(func() {
+			defer wg.Done()
+			fn()
+		})
+	}
+	wg.Wait()
 }

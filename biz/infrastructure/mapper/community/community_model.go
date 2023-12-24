@@ -1,4 +1,4 @@
-package mapper
+package community
 
 import (
 	"context"
@@ -14,6 +14,7 @@ import (
 
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/config"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper"
 )
 
 const CommunityCollectionName = "community"
@@ -109,7 +110,7 @@ func (m *CustomCommunityModel) ListCommunity(ctx context.Context, req *system.Li
 		}
 	}
 
-	findOptions := ToFindOptions(req.Page, req.PageSize, req.Sort)
+	findOptions := mapper.ToFindOptions(req.Page, req.PageSize, req.Sort)
 
 	err := m.conn.Find(ctx, &resp, filter, findOptions)
 	if err != nil {

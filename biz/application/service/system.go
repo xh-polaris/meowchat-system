@@ -5,12 +5,20 @@ import (
 	"time"
 
 	"github.com/samber/lo"
+	"github.com/xh-polaris/gopkg/pagination/mongop"
 	"github.com/xh-polaris/service-idl-gen-go/kitex_gen/meowchat/system"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/consts"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/data/db"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper/admin"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper/apply"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper/community"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper/news"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper/notice"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper/notification"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper/user_role"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/util"
 
 	"github.com/google/wire"
@@ -66,16 +74,17 @@ type SystemService interface {
 	CleanNotification(ctx context.Context, req *system.CleanNotificationReq) (resp *system.CleanNotificationResp, err error)
 	ReadNotification(ctx context.Context, req *system.ReadNotificationReq) (resp *system.ReadNotificationResp, err error)
 	AddNotification(ctx context.Context, req *system.AddNotificationReq) (resp *system.AddNotificationResp, err error)
+	ReadRangeNotification(ctx context.Context, req *system.ReadRangeNotificationReq) (resp *system.ReadRangeNotificationResp, err error)
 }
 
 type SystemServiceImpl struct {
-	AdminModel        mapper.AdminModel
-	ApplyModel        mapper.ApplyModel
-	CommunityModel    mapper.CommunityModel
-	NewsModel         mapper.NewsModel
-	NoticeModel       mapper.NoticeModel
-	UserRoleModel     mapper.UserRoleModel
-	NotificationModel mapper.NotificationModel
+	AdminModel        admin.AdminModel
+	ApplyModel        apply.ApplyModel
+	CommunityModel    community.CommunityModel
+	NewsModel         news.NewsModel
+	NoticeModel       notice.NoticeModel
+	UserRoleModel     user_role.UserRoleModel
+	NotificationModel notification.NotificationModel
 }
 
 var SystemSet = wire.NewSet(
@@ -584,11 +593,16 @@ func (s *SystemServiceImpl) DeleteCommunity(ctx context.Context, req *system.Del
 }
 
 func (s *SystemServiceImpl) ListNotification(ctx context.Context, req *system.ListNotificationReq) (resp *system.ListNotificationResp, err error) {
-	notification, total, err := s.NotificationModel.ListNotification(ctx, req)
+
+	notification, total, err := s.NotificationModel.ListNotification(ctx, req, mongop.IdCursorType)
 	if err != nil {
 		return nil, err
 	}
-	notRead, err := s.NotificationModel.CountNotification(ctx, req.UserId)
+	notRead, err := s.NotificationModel.CountNotification(ctx, &system.CountNotificationReq{
+		UserId:     req.GetUserId(),
+		Type:       req.Type,
+		TargetType: req.TargetType,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -601,7 +615,7 @@ func (s *SystemServiceImpl) ListNotification(ctx context.Context, req *system.Li
 }
 
 func (s *SystemServiceImpl) CountNotification(ctx context.Context, req *system.CountNotificationReq) (resp *system.CountNotificationResp, err error) {
-	notRead, err := s.NotificationModel.CountNotification(ctx, req.UserId)
+	notRead, err := s.NotificationModel.CountNotification(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -630,14 +644,31 @@ func (s *SystemServiceImpl) AddNotification(ctx context.Context, req *system.Add
 		SourceUserId:    req.Notification.GetSourceUserId(),
 		SourceContentId: req.Notification.GetSourceContentId(),
 		Type:            req.Notification.GetType(),
+		TargetType:      req.Notification.GetTargetType(),
 		Text:            req.Notification.GetText(),
 		IsRead:          req.Notification.GetIsRead(),
 		CreateAt:        time.Now(),
 		UpdateAt:        time.Now(),
 	}
-	err = s.NotificationModel.Insert(context.Background(), notification)
+	err = s.NotificationModel.Insert(ctx, notification)
 	if err != nil {
 		return nil, err
 	}
 	return &system.AddNotificationResp{}, nil
+}
+
+func (s *SystemServiceImpl) ReadRangeNotification(ctx context.Context, req *system.ReadRangeNotificationReq) (resp *system.ReadRangeNotificationResp, err error) {
+	err = s.NotificationModel.ReadRange(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	notRead, err := s.NotificationModel.CountNotification(ctx, &system.CountNotificationReq{
+		UserId:     req.GetUserId(),
+		Type:       req.Type,
+		TargetType: req.TargetType,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &system.ReadRangeNotificationResp{NotRead: notRead}, nil
 }

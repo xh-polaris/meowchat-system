@@ -10,7 +10,13 @@ import (
 	"github.com/xh-polaris/meowchat-system/biz/adaptor"
 	"github.com/xh-polaris/meowchat-system/biz/application/service"
 	"github.com/xh-polaris/meowchat-system/biz/infrastructure/config"
-	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper/admin"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper/apply"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper/community"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper/news"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper/notice"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper/notification"
+	"github.com/xh-polaris/meowchat-system/biz/infrastructure/mapper/user_role"
 )
 
 // Injectors from wire.go:
@@ -20,13 +26,13 @@ func NewSystemServerImpl() (*adaptor.SystemServerImpl, error) {
 	if err != nil {
 		return nil, err
 	}
-	adminModel := mapper.NewAdminModel(configConfig)
-	applyModel := mapper.NewApplyModel(configConfig)
-	communityModel := mapper.NewCommunityModel(configConfig)
-	newsModel := mapper.NewNewsModel(configConfig)
-	noticeModel := mapper.NewNoticeModel(configConfig)
-	userRoleModel := mapper.NewUserRoleModel(configConfig)
-	notificationModel := mapper.NewNotificationModel(configConfig)
+	adminModel := admin.NewAdminModel(configConfig)
+	applyModel := apply.NewApplyModel(configConfig)
+	communityModel := community.NewCommunityModel(configConfig)
+	newsModel := news.NewNewsModel(configConfig)
+	noticeModel := notice.NewNoticeModel(configConfig)
+	userRoleModel := user_role.NewUserRoleModel(configConfig)
+	notificationModel := notification.NewNotificationModel(configConfig)
 	systemServiceImpl := &service.SystemServiceImpl{
 		AdminModel:        adminModel,
 		ApplyModel:        applyModel,
